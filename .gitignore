@@ -1,6 +1,9 @@
-# Real secrets and generated files — never commit these
+# Real secrets and generated files — never commit these.
+# config.py and references/ are NOT secrets (no passwords in them) and
+# MUST be committed — Render deploys from this git history, and main.py
+# needs both present at runtime. Only clients.json (real DB credentials)
+# is excluded; it goes to Render as a Secret File instead (see main.py).
 clients.json
-config.py
 *.db
 query_log.jsonl
 __pycache__/

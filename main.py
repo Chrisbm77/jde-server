@@ -322,6 +322,54 @@ def get_jde_schema(authorization: Optional[str] = Header(default=None)):
     return {"result": "\n".join(sections)}
 
 
+# ---------------------------------------------------------------------------
+# Reference document serving — the jde-development skill's actual knowledge
+# content (table design rules, event rule syntax, etc.) lives here instead
+# of being shipped as files to the client. The client's local skill only
+# has a thin fetch script; this is what makes disabling a deployment's key
+# actually stop the skill from working, not just stop future git pulls.
+#
+# REFERENCE_TOPICS is an explicit allowlist, not just "serve whatever's in
+# the folder" — this is what prevents a topic value like "../main.py" (or
+# anything else not on this list) from ever reaching the filesystem.
+# ---------------------------------------------------------------------------
+REFERENCES_DIR = os.path.join(os.path.dirname(__file__), "references")
+
+REFERENCE_TOPICS = {
+    "par-file-structure": "par-file-structure.md",
+    "master-reference": "master-reference.md",
+    "table-design": "table-design.md",
+    "business-view-design": "business-view-design.md",
+    "data-dictionary": "data-dictionary.md",
+    "data-structure-design": "data-structure-design.md",
+    "event-rules": "event-rules.md",
+    "form-design-aid": "form-design-aid.md",
+    "report-design-aid": "report-design-aid.md",
+    "application-design": "application-design.md",
+    "business-function-programming": "business-function-programming.md",
+    "development-tools-overview": "development-tools-overview.md",
+    "core-rules": "core-rules.md",
+}
+
+
+@app.get("/v1/reference/{topic}")
+def get_reference(topic: str, authorization: Optional[str] = Header(default=None)):
+    authenticate(authorization)  # same active/expiry gate as the DB endpoints
+
+    filename = REFERENCE_TOPICS.get(topic)
+    if filename is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Unknown reference topic '{topic}'. Valid topics: {', '.join(sorted(REFERENCE_TOPICS))}",
+        )
+    path = os.path.join(REFERENCES_DIR, filename)
+    if not os.path.exists(path):
+        raise HTTPException(status_code=404, detail=f"Reference file for '{topic}' is missing on the server.")
+    with open(path, "r", encoding="utf-8") as f:
+        content = f.read()
+    return {"content": content}
+
+
 @app.get("/healthz")
 def healthz():
     return {"status": "ok"}
