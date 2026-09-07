@@ -1,0 +1,24 @@
+{
+  "sk_live_REPLACE_WITH_A_LONG_RANDOM_SECRET_1": {
+    "client_name": "Acme Corp - Finance",
+    "department": "finance",
+    "active": true,
+    "expires_on": "2027-03-01",
+    "db": {
+      "dsn": "localhost:15211/JDEDB",
+      "user": "JDE_READONLY_ACME",
+      "password": "REPLACE_ME"
+    }
+  },
+  "sk_live_REPLACE_WITH_A_LONG_RANDOM_SECRET_2": {
+    "client_name": "Acme Corp - Sales",
+    "department": "sales",
+    "active": true,
+    "expires_on": "2027-03-01",
+    "db": {
+      "dsn": "localhost:15211/JDEDB",
+      "user": "JDE_READONLY_ACME",
+      "password": "REPLACE_ME"
+    }
+  }
+}

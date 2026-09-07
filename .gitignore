@@ -1,0 +1,8 @@
+# Real secrets and generated files — never commit these
+clients.json
+config.py
+*.db
+query_log.jsonl
+__pycache__/
+*.pyc
+.env

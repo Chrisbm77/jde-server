@@ -1,0 +1,70 @@
+# Rename this to config.py and replace its contents with your REAL table
+# definitions, rules, and examples before deploying for real — this is a
+# structural template only, matching what main.py expects.
+#
+# This file is the part of your business logic that must never leave this
+# private repo — don't add it to the client-facing repo, and don't paste
+# its contents anywhere a client might see them.
+
+RESTRICT_TO_APPROVED_TABLES = True
+
+# The master boundary — no query can touch a table outside this set,
+# regardless of department. Add a table here only once it's also
+# described below in TABLES.
+ALLOWED_TABLES = {
+    "F0101",   # Address Book
+    "F0911",   # General Ledger
+    "F0411",   # Accounts Payable
+    "F4211",   # Sales Order Detail
+}
+
+# Oracle schema prefix per table (used only when a real Oracle DSN is
+# configured for a deployment — irrelevant for mock/testing).
+TABLE_SCHEMAS = {
+    "F0101": "CRPDTA",
+    "F0911": "PRODDTA",
+    "F0411": "PRODDTA",
+    "F4211": "PRODDTA",
+}
+
+# Column descriptions Claude uses to write correct SQL. Keep these
+# accurate and specific — this is most of what makes the tool actually
+# useful, not just permitted.
+TABLES = [
+    {
+        "name": "F0101",
+        "description": "Address Book — customers, suppliers, employees",
+        "columns": [
+            ("AN8", "NUMBER", "Address Book Number — the primary key"),
+            ("ALPH", "VARCHAR2(40)", "Name (alpha search name)"),
+        ],
+        "notes": [],
+    },
+    {
+        "name": "F0911",
+        "description": "General Ledger — account transactions",
+        "columns": [
+            ("DOC", "NUMBER", "Document number"),
+            ("AN8", "NUMBER", "Address Book Number, links to F0101"),
+        ],
+        "notes": ["Always filter by a date range — this table is large."],
+    },
+]
+
+# Which department may see which tables, by table-name PREFIX (not an
+# exhaustive list — see config_department_tables_snippet.py from earlier
+# for the full explanation). Keys are what you'll set as the department
+# in clients.json for each deployment.
+DEPARTMENT_TABLE_PREFIXES = {
+    "finance": ["F09", "F04", "F03B"],
+    "sales": ["F42", "F0101"],
+}
+
+RULES = [
+    "Always filter General Ledger queries by a date range.",
+    "Join to F0101 to resolve a customer or supplier name from an Address Book Number.",
+]
+
+EXAMPLES = [
+    ("Who is address book number 4242?", "SELECT * FROM {F0101} WHERE AN8 = 4242"),
+]
